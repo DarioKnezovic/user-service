@@ -24,5 +24,5 @@ func NewUserRepository() UserRepository {
 func (r *userRepository) SaveUser(newUser user.User) (*user.User, error) {
 	// Implementation for saving user to data storage
 	// Return the saved user and any error encountered
-	return nil, nil
+	return &newUser, nil
 }
