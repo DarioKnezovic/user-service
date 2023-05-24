@@ -20,4 +20,4 @@ COPY . .
 EXPOSE 5050
 
 # Set the entry point command to run the application with air
-CMD ["air", "-c", ".air.toml"]
+ENTRYPOINT ["air"]

@@ -1,10 +1,19 @@
 version: "3.8"
+
+networks:
+  abd-backend:
+    external:
+      name: api-gateway_abd-backend
+
 services:
-  web:
+  api:
+    hostname: user-service
     build:
-      context: .
+      context: ./
       # Correct the path to your Dockerfile
       dockerfile: Dockerfile
+    networks:
+      - abd-backend
     ports:
       - 5050:5050
     # Important to bind/mount your codebase dir to /app dir for live reload
