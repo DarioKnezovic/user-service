@@ -9,10 +9,14 @@ import (
 
 // Config holds the configuration values
 type Config struct {
-	APIPort     string
-	ProjectName string
-	DatabaseURL string
-	DebugMode   bool
+	APIPort          string
+	ProjectName      string
+	DatabaseURL      string
+	DatabaseUsername string
+	DatabasePassword string
+	DatabaseName     string
+	DatabasePort     string
+	DebugMode        bool
 }
 
 // LoadConfig loads the configuration values from environment variables or the .env file
@@ -25,6 +29,10 @@ func LoadConfig() *Config {
 	apiPort := getEnv("API_PORT", "8080")
 	projectName := getEnv("PROJECT_NAME", "")
 	databaseURL := getEnv("DATABASE_URL", "")
+	databaseUsername := getEnv("DATABASE_USERNAME", "")
+	databasePassword := getEnv("DATABASE_PASSWORD", "")
+	databasePort := getEnv("DATABASE_PORT", "")
+	databaseName := getEnv("DATABASE_NAME", "")
 	debugMode, err := strconv.ParseBool(getEnv("DEBUG_MODE", "false"))
 	if err != nil {
 		log.Println("Failed to parse DEBUG_MODE. Defaulting to false.")
@@ -32,10 +40,14 @@ func LoadConfig() *Config {
 	}
 
 	return &Config{
-		APIPort:     apiPort,
-		ProjectName: projectName,
-		DatabaseURL: databaseURL,
-		DebugMode:   debugMode,
+		APIPort:          apiPort,
+		ProjectName:      projectName,
+		DatabaseURL:      databaseURL,
+		DatabaseUsername: databaseUsername,
+		DatabasePassword: databasePassword,
+		DatabaseName:     databaseName,
+		DatabasePort:     databasePort,
+		DebugMode:        debugMode,
 	}
 }
 

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/DarioKnezovic/user-service/config"
+	"github.com/DarioKnezovic/user-service/pkg/database"
 	"log"
 	"net/http"
 
@@ -15,6 +16,11 @@ func main() {
 	cfg := config.LoadConfig()
 	// Create a user repository
 	userRepo := repository.NewUserRepository()
+
+	_, err := database.ConnectDB()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Create a user service with the repository
 	userService := service.NewUserService(userRepo)
