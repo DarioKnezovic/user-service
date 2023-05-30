@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"github.com/DarioKnezovic/user-service/internal/user"
 	"gorm.io/gorm"
 )
@@ -39,6 +40,9 @@ func (r *userRepository) FindUserByEmail(email string) (*user.User, error) {
 	var foundUser user.User
 	err := r.db.Where("email = ?", email).First(&foundUser).Error
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
 		return nil, err
 	}
 

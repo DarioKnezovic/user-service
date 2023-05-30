@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/DarioKnezovic/user-service/internal/user"
 	"github.com/DarioKnezovic/user-service/pkg/util"
 	"log"
@@ -36,19 +37,39 @@ func (h *UserHandler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	var loginUser user.User
 	err := json.NewDecoder(r.Body).Decode(&loginUser)
 	if err != nil {
-		// TODO: add response body
 		util.SendJSONResponse(w, http.StatusBadRequest, nil)
-		log.Panic(err)
+		log.Println(err)
 		return
 	}
 
 	token, err := h.UserService.LoginUser(loginUser)
 	if err != nil {
-		// TODO: add response body
-		util.SendJSONResponse(w, http.StatusNotFound, nil)
-		log.Panic(err)
+		var statusCode int
+		var responseBody interface{}
+
+		switch {
+		case errors.Is(err, h.UserService.GetError("ErrUserNotFound")):
+			statusCode = http.StatusNotFound
+			responseBody = map[string]string{
+				"error": "User not found",
+			}
+		case errors.Is(err, h.UserService.GetError("ErrInvalidPassword")):
+			statusCode = http.StatusUnauthorized
+			responseBody = map[string]string{
+				"error": "Invalid password",
+			}
+		default:
+			statusCode = http.StatusInternalServerError
+			responseBody = map[string]string{
+				"error": "Internal server error",
+			}
+			log.Println(err)
+		}
+
+		util.SendJSONResponse(w, statusCode, responseBody)
 		return
 	}
+
 	responseBody := map[string]string{
 		"token": token,
 	}

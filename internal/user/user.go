@@ -21,4 +21,5 @@ type User struct {
 type UserService interface {
 	RegisterUser(newUser User) (*User, error)
 	LoginUser(loginUser User) (string, error)
+	GetError(key string) error
 }

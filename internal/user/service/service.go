@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"github.com/DarioKnezovic/user-service/config"
 	"github.com/DarioKnezovic/user-service/internal/user"
 	"github.com/DarioKnezovic/user-service/internal/user/repository"
@@ -10,6 +9,17 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
+
+var UserErrors = map[string]error{
+	// ErrUserNotFound is returned when a user is not found in the repository.
+	"ErrUserNotFound": errors.New("user not found"),
+
+	// ErrInvalidPassword is returned when the provided password is invalid.
+	"ErrInvalidPassword": errors.New("invalid password"),
+
+	// ErrRecordNotFound is returned when record is not found or empty
+	"ErrRecordNotFound": errors.New("record not found"),
+}
 
 // UserService represents the user service implementation.
 type UserService struct {
@@ -21,6 +31,11 @@ func NewUserService(userRepository repository.UserRepository) *UserService {
 	return &UserService{
 		userRepository: userRepository,
 	}
+}
+
+// GetError returns error by key stored in UserErrors
+func (s *UserService) GetError(key string) error {
+	return UserErrors[key]
 }
 
 // HashPassword hashes the provided password using bcrypt.
@@ -38,7 +53,7 @@ func (s *UserService) RegisterUser(newUser user.User) (*user.User, error) {
 	// Hash the password before saving the user
 	hashedPassword, err := s.HashPassword(newUser.Password)
 	if err != nil {
-		return nil, fmt.Errorf("failed to hash password: %w", err)
+		return nil, err
 	}
 	newUser.Password = hashedPassword
 
@@ -59,20 +74,20 @@ func (s *UserService) LoginUser(loginUser user.User) (string, error) {
 
 	// Check if the user exists
 	if existingUser == nil {
-		return "", errors.New("user not found")
+		return "", UserErrors["ErrUserNotFound"]
 	}
 
 	// Compare the provided password with the hashed password in the user object
 	err = bcrypt.CompareHashAndPassword([]byte(existingUser.Password), []byte(loginUser.Password))
 	if err != nil {
-		return "", errors.New("invalid password")
+		return "", UserErrors["ErrInvalidPassword"]
 	}
 
 	cfg := config.LoadConfig()
 	// Password is correct, generate the authentication token
 	token, err := util.GenerateJWT(existingUser.ID, existingUser.Email, []byte(cfg.JWTSecretKey), time.Hour*24) // Adjust the secret key and token expiration time as needed
 	if err != nil {
-		return "", fmt.Errorf("failed to generate JWT token: %w", err)
+		return "", err
 	}
 
 	// Return the authenticated user and the generated token
