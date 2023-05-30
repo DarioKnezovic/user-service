@@ -16,6 +16,7 @@ type Config struct {
 	DatabasePassword string
 	DatabaseName     string
 	DatabasePort     string
+	JWTSecretKey     string
 	DebugMode        bool
 }
 
@@ -33,6 +34,7 @@ func LoadConfig() *Config {
 	databasePassword := getEnv("DATABASE_PASSWORD", "")
 	databasePort := getEnv("DATABASE_PORT", "")
 	databaseName := getEnv("DATABASE_NAME", "")
+	jwtSecretKey := getEnv("JWT_SECRET_KEY", "")
 	debugMode, err := strconv.ParseBool(getEnv("DEBUG_MODE", "false"))
 	if err != nil {
 		log.Println("Failed to parse DEBUG_MODE. Defaulting to false.")
@@ -47,6 +49,7 @@ func LoadConfig() *Config {
 		DatabasePassword: databasePassword,
 		DatabaseName:     databaseName,
 		DatabasePort:     databasePort,
+		JWTSecretKey:     jwtSecretKey,
 		DebugMode:        debugMode,
 	}
 }

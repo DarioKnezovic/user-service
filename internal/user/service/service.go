@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"github.com/DarioKnezovic/user-service/config"
 	"github.com/DarioKnezovic/user-service/internal/user"
 	"github.com/DarioKnezovic/user-service/internal/user/repository"
 	"github.com/DarioKnezovic/user-service/pkg/util"
@@ -67,8 +68,9 @@ func (s *UserService) LoginUser(loginUser user.User) (string, error) {
 		return "", errors.New("invalid password")
 	}
 
+	cfg := config.LoadConfig()
 	// Password is correct, generate the authentication token
-	token, err := util.GenerateJWT(existingUser.ID, existingUser.Email, []byte("your-secret-key"), time.Hour*24) // Adjust the secret key and token expiration time as needed
+	token, err := util.GenerateJWT(existingUser.ID, existingUser.Email, []byte(cfg.JWTSecretKey), time.Hour*24) // Adjust the secret key and token expiration time as needed
 	if err != nil {
 		return "", fmt.Errorf("failed to generate JWT token: %w", err)
 	}
