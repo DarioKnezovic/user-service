@@ -1,15 +1,24 @@
 package user
 
+import (
+	"gorm.io/gorm"
+	"time"
+)
+
 // User represents a user entity.
 type User struct {
-	ID        string `json:"id"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Email     string `json:"email"`
-	Password  string `json:"password"`
+	ID        uint           `gorm:"primaryKey" json:"id"`
+	FirstName string         `gorm:"not null" json:"first_name"`
+	LastName  string         `gorm:"not null" json:"last_name"`
+	Email     string         `gorm:"unique;not null" json:"email"`
+	Password  string         `gorm:"not null" json:"password"`
+	CreatedAt time.Time      `json:"createdAt"`
+	UpdatedAt time.Time      `json:"updatedAt"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 // UserService represents the user service interface.
 type UserService interface {
 	RegisterUser(newUser User) (*User, error)
+	LoginUser(loginUser User) (string, error)
 }

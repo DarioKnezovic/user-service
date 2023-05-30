@@ -14,14 +14,21 @@ import (
 
 func main() {
 	cfg := config.LoadConfig()
-	// Create a user repository
-	userRepo := repository.NewUserRepository()
 
-	_, err := database.ConnectDB()
+	// Connect to the database
+	db, err := database.ConnectDB()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// Perform auto migrations
+	err = database.PerformAutoMigrations(db)
+	if err != nil {
+		log.Fatalf("Failed to perform auto migrations: %v", err)
+	}
+
+	// Create a user repository
+	userRepo := repository.NewUserRepository(db)
 	// Create a user service with the repository
 	userService := service.NewUserService(userRepo)
 

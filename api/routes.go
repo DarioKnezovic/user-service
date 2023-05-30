@@ -14,5 +14,6 @@ func RegisterRoutes(userService user.UserService) {
 	}
 
 	http.HandleFunc("/api/user/register", userHandler.RegisterUserHandler)
+	http.HandleFunc("/api/user/login", userHandler.LoginUserHandler)
 	// Add more routes and handlers as needed
 }
