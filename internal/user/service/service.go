@@ -16,10 +16,12 @@ var UserErrors = map[string]error{
 
 	// ErrInvalidPassword is returned when the provided password is invalid.
 	"ErrInvalidPassword": errors.New("invalid password"),
-
-	// ErrRecordNotFound is returned when record is not found or empty
-	"ErrRecordNotFound": errors.New("record not found"),
 }
+
+const (
+	ERR_USER_NOT_FOUND   = "ErrUserNotFound"
+	ERR_INVALID_PASSWORD = "ErrInvalidPassword"
+)
 
 // UserService represents the user service implementation.
 type UserService struct {
@@ -74,13 +76,13 @@ func (s *UserService) LoginUser(loginUser user.User) (string, error) {
 
 	// Check if the user exists
 	if existingUser == nil {
-		return "", UserErrors["ErrUserNotFound"]
+		return "", UserErrors[ERR_USER_NOT_FOUND]
 	}
 
 	// Compare the provided password with the hashed password in the user object
 	err = bcrypt.CompareHashAndPassword([]byte(existingUser.Password), []byte(loginUser.Password))
 	if err != nil {
-		return "", UserErrors["ErrInvalidPassword"]
+		return "", UserErrors[ERR_INVALID_PASSWORD]
 	}
 
 	cfg := config.LoadConfig()
