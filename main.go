@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"github.com/DarioKnezovic/user-service/config"
 	userGrpc "github.com/DarioKnezovic/user-service/internal/grpc"
+	sessionRepo "github.com/DarioKnezovic/user-service/internal/session/repository"
+	session "github.com/DarioKnezovic/user-service/internal/session/service"
 	"github.com/DarioKnezovic/user-service/internal/user/repository"
 	"github.com/DarioKnezovic/user-service/internal/user/service"
 	"github.com/DarioKnezovic/user-service/pkg/database"
@@ -33,8 +35,12 @@ func main() {
 
 	// Create a user repository
 	userRepo := repository.NewUserRepository(db)
+	// Create a session repository
+	sessionRepository := sessionRepo.NewSessionRepository(db)
+	// Create a session service
+	sessionService := session.NewSessionService(sessionRepository)
 	// Create a user service with the repository
-	userService := service.NewUserService(userRepo)
+	userService := service.NewUserService(userRepo, sessionService)
 
 	// Register the API routes
 	api.RegisterRoutes(userService)

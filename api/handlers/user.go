@@ -76,3 +76,22 @@ func (h *UserHandler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 
 	util.SendJSONResponse(w, http.StatusOK, responseBody)
 }
+
+func (h *UserHandler) LogoutUserHandler(w http.ResponseWriter, r *http.Request) {
+	var loggedUser user.User
+	err := json.NewDecoder(r.Body).Decode(&loggedUser)
+	if err != nil {
+		log.Println(err)
+		util.SendJSONResponse(w, http.StatusBadRequest, nil)
+		return
+	}
+
+	err = h.UserService.LogoutUser(loggedUser.ID)
+	if err != nil {
+		log.Println(err)
+		util.SendJSONResponse(w, http.StatusInternalServerError, nil)
+		return
+	}
+
+	util.SendJSONResponse(w, http.StatusOK, nil)
+}

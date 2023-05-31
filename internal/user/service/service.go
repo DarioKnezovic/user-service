@@ -2,12 +2,10 @@ package service
 
 import (
 	"errors"
-	"github.com/DarioKnezovic/user-service/config"
+	"github.com/DarioKnezovic/user-service/internal/session/service"
 	"github.com/DarioKnezovic/user-service/internal/user"
 	"github.com/DarioKnezovic/user-service/internal/user/repository"
-	"github.com/DarioKnezovic/user-service/pkg/util"
 	"golang.org/x/crypto/bcrypt"
-	"time"
 )
 
 var UserErrors = map[string]error{
@@ -16,22 +14,27 @@ var UserErrors = map[string]error{
 
 	// ErrInvalidPassword is returned when the provided password is invalid.
 	"ErrInvalidPassword": errors.New("invalid password"),
+
+	"ErrInternalServerError": errors.New("internal server error"),
 }
 
 const (
-	ERR_USER_NOT_FOUND   = "ErrUserNotFound"
-	ERR_INVALID_PASSWORD = "ErrInvalidPassword"
+	ERR_USER_NOT_FOUND        = "ErrUserNotFound"
+	ERR_INVALID_PASSWORD      = "ErrInvalidPassword"
+	ERR_INTERNAL_SERVER_ERROR = "ErrInternalServerError"
 )
 
 // UserService represents the user service implementation.
 type UserService struct {
 	userRepository repository.UserRepository
+	sessionService *service.SessionService
 }
 
 // NewUserService creates a new instance of UserService.
-func NewUserService(userRepository repository.UserRepository) *UserService {
+func NewUserService(userRepository repository.UserRepository, sessionService *service.SessionService) *UserService {
 	return &UserService{
 		userRepository: userRepository,
+		sessionService: sessionService,
 	}
 }
 
@@ -85,19 +88,25 @@ func (s *UserService) LoginUser(loginUser user.User) (string, error) {
 		return "", UserErrors[ERR_INVALID_PASSWORD]
 	}
 
-	cfg := config.LoadConfig()
-	// Password is correct, generate the authentication token
-	token, err := util.GenerateJWT(existingUser.ID, existingUser.Email, []byte(cfg.JWTSecretKey), time.Hour*24) // Adjust the secret key and token expiration time as needed
+	token, err := s.sessionService.CreateSession(existingUser)
 	if err != nil {
-		return "", err
+		return "", UserErrors[ERR_INTERNAL_SERVER_ERROR]
 	}
 
 	// Return the authenticated user and the generated token
 	return token, nil
 }
 
-func (s *UserService) CheckIsUserExists(userId string) (bool, error) {
+func (s *UserService) LogoutUser(userId uint) error {
+	err := s.sessionService.EndSession(userId)
+	if err != nil {
+		return UserErrors[ERR_INTERNAL_SERVER_ERROR]
+	}
 
+	return nil
+}
+
+func (s *UserService) CheckIsUserExists(userId string) (bool, error) {
 	exists, err := s.userRepository.CheckUserExists(userId)
 	if err != nil {
 		return false, err
