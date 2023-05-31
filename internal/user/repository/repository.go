@@ -10,6 +10,7 @@ import (
 type UserRepository interface {
 	SaveUser(newUser user.User) (*user.User, error)
 	FindUserByEmail(email string) (*user.User, error)
+	CheckUserExists(userID string) (bool, error)
 }
 
 // userRepository represents an implementation of UserRepository.
@@ -47,4 +48,20 @@ func (r *userRepository) FindUserByEmail(email string) (*user.User, error) {
 	}
 
 	return &foundUser, nil
+}
+
+func (r *userRepository) CheckUserExists(userID string) (bool, error) {
+	var foundUser user.User
+	err := r.db.Where("id = ?", userID).First(&foundUser).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// User not found in the database
+			return false, nil
+		}
+		// Other error occurred
+		return false, err
+	}
+
+	// User found in the database
+	return true, nil
 }

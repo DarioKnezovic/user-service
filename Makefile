@@ -16,3 +16,6 @@ hot-reload:
 .PHONY: dev
 dev:
 	docker-compose up
+
+proto-generate:
+	cd proto && protoc --go_out=. --go-grpc_out=. user.proto

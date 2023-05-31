@@ -17,6 +17,7 @@ type Config struct {
 	DatabaseName     string
 	DatabasePort     string
 	JWTSecretKey     string
+	GRPCPort         string
 	DebugMode        bool
 }
 
@@ -34,6 +35,7 @@ func LoadConfig() *Config {
 	databasePassword := getEnv("DATABASE_PASSWORD", "")
 	databasePort := getEnv("DATABASE_PORT", "")
 	databaseName := getEnv("DATABASE_NAME", "")
+	gRPCPort := getEnv("GRPC_PORT", "")
 	jwtSecretKey := getEnv("JWT_SECRET_KEY", "")
 	debugMode, err := strconv.ParseBool(getEnv("DEBUG_MODE", "false"))
 	if err != nil {
@@ -50,6 +52,7 @@ func LoadConfig() *Config {
 		DatabaseName:     databaseName,
 		DatabasePort:     databasePort,
 		JWTSecretKey:     jwtSecretKey,
+		GRPCPort:         gRPCPort,
 		DebugMode:        debugMode,
 	}
 }

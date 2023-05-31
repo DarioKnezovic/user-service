@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "./";
+
+package user;
+
+service UserService {
+  rpc CheckUserExists(UserExistsRequest) returns (UserExistsResponse) {}
+}
+
+message UserExistsRequest {
+  string user_id = 1;
+}
+
+message UserExistsResponse {
+  bool exists = 1;
+}

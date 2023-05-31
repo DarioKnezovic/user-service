@@ -16,6 +16,7 @@ services:
       - abd-backend
     ports:
       - 5050:5050
+      - 50051:50051
     # Important to bind/mount your codebase dir to /app dir for live reload
     volumes:
       - ./:/app

@@ -19,5 +19,8 @@ COPY . .
 # Expose the port on which the application will listen
 EXPOSE 5050
 
+# Export the gRPC port
+EXPOSE 50051
+
 # Set the entry point command to run the application with air
 ENTRYPOINT ["air"]
