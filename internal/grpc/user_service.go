@@ -2,30 +2,24 @@ package grpc
 
 import (
 	"context"
-	"github.com/DarioKnezovic/user-service/internal/user/repository"
+	"github.com/DarioKnezovic/user-service/internal/user/service"
 	user "github.com/DarioKnezovic/user-service/proto"
 	"log"
 )
 
 type UserServiceServer struct {
 	user.UnimplementedUserServiceServer
-	UserRepository repository.UserRepository
+	UserService *service.UserService
 }
 
 func (s *UserServiceServer) CheckUserExists(ctx context.Context, req *user.UserExistsRequest) (*user.UserExistsResponse, error) {
 	log.Println("Check user exists received for ID: ", req.UserId)
 	userID := req.UserId
-	exists := checkUserExistsInDatabase(userID, s.UserRepository)
-
-	return &user.UserExistsResponse{Exists: exists}, nil
-}
-
-func checkUserExistsInDatabase(userID string, repo repository.UserRepository) bool {
-	exist, err := repo.CheckUserExists(userID)
+	exists, err := s.UserService.CheckIsUserExists(userID)
 	if err != nil {
-		log.Println(err)
-		return false
+		log.Printf("CheckUserExists function has thrown an error: %v", err)
+		return nil, err
 	}
 
-	return exist
+	return &user.UserExistsResponse{Exists: exists}, nil
 }

@@ -95,3 +95,13 @@ func (s *UserService) LoginUser(loginUser user.User) (string, error) {
 	// Return the authenticated user and the generated token
 	return token, nil
 }
+
+func (s *UserService) CheckIsUserExists(userId string) (bool, error) {
+
+	exists, err := s.userRepository.CheckUserExists(userId)
+	if err != nil {
+		return false, err
+	}
+
+	return exists, nil
+}

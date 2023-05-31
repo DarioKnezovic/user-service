@@ -42,7 +42,7 @@ func main() {
 	// Start gRPC server
 	server := grpc.NewServer()
 	userServiceGrpc := &userGrpc.UserServiceServer{
-		UserRepository: userRepo,
+		UserService: userService,
 	}
 	user.RegisterUserServiceServer(server, userServiceGrpc)
 
