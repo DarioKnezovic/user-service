@@ -6,6 +6,7 @@ import (
 	"github.com/DarioKnezovic/user-service/internal/session/repository"
 	"github.com/DarioKnezovic/user-service/internal/user"
 	"github.com/DarioKnezovic/user-service/pkg/util"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -42,4 +43,18 @@ func (s *SessionService) CreateSession(user *user.User) (string, error) {
 
 func (s *SessionService) EndSession(userId uint) error {
 	return s.sessionRepository.DeleteSession(userId)
+}
+
+func (s *SessionService) GetSessionByToken(token string) (bool, error) {
+	exist, err := s.sessionRepository.FindSessionById(token)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// User not found in the database
+			return false, nil
+		}
+		// Other error occurred
+		return false, err
+	}
+
+	return exist, nil
 }

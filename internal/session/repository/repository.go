@@ -8,6 +8,7 @@ import (
 type SessionRepository interface {
 	StoreSession(sessionData session.Session) (*session.Session, error)
 	DeleteSession(userId uint) error
+	FindSessionById(token string) (bool, error)
 }
 
 type sessionRepository struct {
@@ -49,4 +50,19 @@ func (r *sessionRepository) DeleteSession(userId uint) error {
 
 	// Deletion successful
 	return nil
+}
+
+func (r *sessionRepository) FindSessionById(token string) (bool, error) {
+	var foundedSession session.Session
+	err := r.db.Where("session_id = ?", token).First(&foundedSession).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// User not found in the database
+			return false, nil
+		}
+		// Other error occurred
+		return false, err
+	}
+
+	return true, nil
 }

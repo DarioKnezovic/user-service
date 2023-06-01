@@ -22,6 +22,6 @@ type UserService interface {
 	RegisterUser(newUser User) (*User, error)
 	LoginUser(loginUser User) (string, error)
 	LogoutUser(usedId uint) error
-	CheckIsUserExists(userId string) (bool, error)
+	CheckIsUserExists(userId uint) (bool, error)
 	GetError(key string) error
 }

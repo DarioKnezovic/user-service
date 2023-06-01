@@ -106,7 +106,7 @@ func (s *UserService) LogoutUser(userId uint) error {
 	return nil
 }
 
-func (s *UserService) CheckIsUserExists(userId string) (bool, error) {
+func (s *UserService) CheckIsUserExists(userId uint) (bool, error) {
 	exists, err := s.userRepository.CheckUserExists(userId)
 	if err != nil {
 		return false, err

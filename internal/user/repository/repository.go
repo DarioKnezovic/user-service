@@ -10,7 +10,7 @@ import (
 type UserRepository interface {
 	SaveUser(newUser user.User) (*user.User, error)
 	FindUserByEmail(email string) (*user.User, error)
-	CheckUserExists(userID string) (bool, error)
+	CheckUserExists(userID uint) (bool, error)
 }
 
 // userRepository represents an implementation of UserRepository.
@@ -50,7 +50,7 @@ func (r *userRepository) FindUserByEmail(email string) (*user.User, error) {
 	return &foundUser, nil
 }
 
-func (r *userRepository) CheckUserExists(userID string) (bool, error) {
+func (r *userRepository) CheckUserExists(userID uint) (bool, error) {
 	var foundUser user.User
 	err := r.db.Where("id = ?", userID).First(&foundUser).Error
 	if err != nil {
