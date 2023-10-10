@@ -28,7 +28,7 @@ func LoadConfig() *Config {
 		log.Println("Error loading .env file:", err)
 	}
 
-	apiPort := getEnv("API_PORT", "8080")
+	apiPort := getEnv("API_PORT", "5050")
 	projectName := getEnv("PROJECT_NAME", "")
 	databaseURL := getEnv("DATABASE_URL", "")
 	databaseUsername := getEnv("DATABASE_USERNAME", "")
