@@ -95,5 +95,18 @@ func (h *UserHandler) LogoutUserHandler(c *gin.Context) {
 }
 
 func (h *UserHandler) GetUserDetailsHandler(c *gin.Context) {
-	log.Println("Test")
+	id := c.Param("id")
+	if id == "" {
+		util.SendJSONResponse(c, http.StatusBadRequest, nil)
+		return
+	}
+
+	fetchedUser, err := h.UserService.GetUser(id)
+	if err != nil {
+		log.Println(err)
+		util.SendJSONResponse(c, http.StatusInternalServerError, nil)
+		return
+	}
+
+	util.SendJSONResponse(c, http.StatusOK, fetchedUser)
 }

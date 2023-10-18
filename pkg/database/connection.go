@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"gorm.io/gorm/logger"
 	"log"
 
 	"github.com/DarioKnezovic/user-service/config"
@@ -16,7 +17,9 @@ func ConnectDB() (*gorm.DB, error) {
 		cfg.DatabaseURL, cfg.DatabaseUsername, cfg.DatabasePassword, cfg.DatabaseName, cfg.DatabasePort)
 
 	log.Printf("Attempting to connect on database...")
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to the database: %w", err)
 	}

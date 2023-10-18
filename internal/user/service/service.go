@@ -114,3 +114,7 @@ func (s *UserService) CheckIsUserExists(userId uint) (bool, error) {
 
 	return exists, nil
 }
+
+func (s *UserService) GetUser(userId string) (user.User, error) {
+	return s.userRepository.GetUserById(userId)
+}

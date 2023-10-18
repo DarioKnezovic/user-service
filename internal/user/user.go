@@ -24,4 +24,5 @@ type UserService interface {
 	LogoutUser(usedId uint) error
 	CheckIsUserExists(userId uint) (bool, error)
 	GetError(key string) error
+	GetUser(userId string) (User, error)
 }
