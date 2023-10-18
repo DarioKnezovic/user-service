@@ -149,3 +149,15 @@ func (s *UserService) UpdateUser(userId string, payload user.User) error {
 
 	return s.userRepository.UpdateUserById(userId, foundedUser)
 }
+
+func (s *UserService) DeleteUser(userId string) error {
+	foundedUser, err := s.userRepository.GetUserById(userId)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return errors.New("Record not found")
+		}
+		return err
+	}
+
+	return s.userRepository.DeleteUserById(foundedUser)
+}

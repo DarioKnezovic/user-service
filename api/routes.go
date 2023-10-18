@@ -18,4 +18,5 @@ func RegisterRoutes(router *gin.Engine, userService user.UserService) {
 
 	router.GET("/api/users/:id", userHandler.GetUserDetailsHandler)
 	router.PUT("/api/users/:id", userHandler.UpdateUserHandler)
+	router.DELETE("/api/users/:id", userHandler.DeleteUserHandler)
 }

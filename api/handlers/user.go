@@ -138,3 +138,22 @@ func (h *UserHandler) UpdateUserHandler(c *gin.Context) {
 
 	util.SendJSONResponse(c, http.StatusOK, []interface{}{})
 }
+
+func (h *UserHandler) DeleteUserHandler(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		util.SendJSONResponse(c, http.StatusBadRequest, nil)
+		return
+	}
+
+	err := h.UserService.DeleteUser(id)
+	if err != nil {
+		if err.Error() == "Record not found" {
+			util.SendJSONResponse(c, http.StatusNotFound, nil)
+			return
+		}
+
+		util.SendJSONResponse(c, http.StatusInternalServerError, nil)
+		return
+	}
+}

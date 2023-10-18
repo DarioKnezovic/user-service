@@ -13,6 +13,7 @@ type UserRepository interface {
 	CheckUserExists(userID uint) (bool, error)
 	GetUserById(userId string) (user.User, error)
 	UpdateUserById(userId string, payload user.User) error
+	DeleteUserById(userToDelete user.User) error
 }
 
 // userRepository represents an implementation of UserRepository.
@@ -80,4 +81,8 @@ func (r *userRepository) GetUserById(userId string) (user.User, error) {
 
 func (r *userRepository) UpdateUserById(userId string, payload user.User) error {
 	return r.db.Where("id = ?", userId).Save(&payload).Error
+}
+
+func (r *userRepository) DeleteUserById(userToDelete user.User) error {
+	return r.db.Delete(&userToDelete).Error
 }

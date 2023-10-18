@@ -26,4 +26,5 @@ type UserService interface {
 	GetError(key string) error
 	GetUser(userId string) (User, error)
 	UpdateUser(userId string, payload User) error
+	DeleteUser(userId string) error
 }
