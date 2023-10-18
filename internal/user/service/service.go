@@ -6,6 +6,7 @@ import (
 	"github.com/DarioKnezovic/user-service/internal/user"
 	"github.com/DarioKnezovic/user-service/internal/user/repository"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 var UserErrors = map[string]error{
@@ -116,5 +117,35 @@ func (s *UserService) CheckIsUserExists(userId uint) (bool, error) {
 }
 
 func (s *UserService) GetUser(userId string) (user.User, error) {
-	return s.userRepository.GetUserById(userId)
+	foundedUser, err := s.userRepository.GetUserById(userId)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// User not found in the database
+			return user.User{}, nil
+		}
+	}
+
+	return foundedUser, nil
+}
+
+func (s *UserService) UpdateUser(userId string, payload user.User) error {
+	foundedUser, err := s.userRepository.GetUserById(userId)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return errors.New("Record not found")
+		}
+		return err
+	}
+
+	hashedPassword, err := s.HashPassword(payload.Password)
+	if err != nil {
+		return err
+	}
+
+	foundedUser.FirstName = payload.FirstName
+	foundedUser.LastName = payload.LastName
+	foundedUser.Email = payload.Email
+	foundedUser.Password = hashedPassword
+
+	return s.userRepository.UpdateUserById(userId, foundedUser)
 }

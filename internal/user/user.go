@@ -25,4 +25,5 @@ type UserService interface {
 	CheckIsUserExists(userId uint) (bool, error)
 	GetError(key string) error
 	GetUser(userId string) (User, error)
+	UpdateUser(userId string, payload User) error
 }

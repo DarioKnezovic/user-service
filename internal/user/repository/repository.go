@@ -12,6 +12,7 @@ type UserRepository interface {
 	FindUserByEmail(email string) (*user.User, error)
 	CheckUserExists(userID uint) (bool, error)
 	GetUserById(userId string) (user.User, error)
+	UpdateUserById(userId string, payload user.User) error
 }
 
 // userRepository represents an implementation of UserRepository.
@@ -71,13 +72,12 @@ func (r *userRepository) GetUserById(userId string) (user.User, error) {
 	var foundUser user.User
 	err := r.db.Where("id = ?", userId).First(&foundUser).Error
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			// User not found in the database
-			return user.User{}, nil
-		}
-		// Other error occurred
 		return user.User{}, err
 	}
 
 	return foundUser, nil
+}
+
+func (r *userRepository) UpdateUserById(userId string, payload user.User) error {
+	return r.db.Where("id = ?", userId).Save(&payload).Error
 }

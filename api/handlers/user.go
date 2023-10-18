@@ -110,3 +110,31 @@ func (h *UserHandler) GetUserDetailsHandler(c *gin.Context) {
 
 	util.SendJSONResponse(c, http.StatusOK, fetchedUser)
 }
+
+func (h *UserHandler) UpdateUserHandler(c *gin.Context) {
+	id := c.Param("id")
+	if id == "" {
+		util.SendJSONResponse(c, http.StatusBadRequest, nil)
+		return
+	}
+
+	var userPayload user.User
+	if err := c.BindJSON(&userPayload); err != nil {
+		// Handle JSON decoding error
+		util.SendJSONResponse(c, http.StatusBadRequest, nil)
+		return
+	}
+
+	err := h.UserService.UpdateUser(id, userPayload)
+	if err != nil {
+		if err.Error() == "Record not found" {
+			util.SendJSONResponse(c, http.StatusNotFound, nil)
+			return
+		}
+
+		util.SendJSONResponse(c, http.StatusInternalServerError, nil)
+		return
+	}
+
+	util.SendJSONResponse(c, http.StatusOK, []interface{}{})
+}

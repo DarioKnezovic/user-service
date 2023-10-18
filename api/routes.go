@@ -17,4 +17,5 @@ func RegisterRoutes(router *gin.Engine, userService user.UserService) {
 	router.POST("/api/user/logout", userHandler.LogoutUserHandler)
 
 	router.GET("/api/users/:id", userHandler.GetUserDetailsHandler)
+	router.PUT("/api/users/:id", userHandler.UpdateUserHandler)
 }
