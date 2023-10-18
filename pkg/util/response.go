@@ -1,16 +1,11 @@
 package util
 
 import (
-	"encoding/json"
-	"net/http"
+	"github.com/gin-gonic/gin"
 )
 
-// SendJSONResponse sends an HTTP response with the given status code and response body.
-func SendJSONResponse(w http.ResponseWriter, statusCode int, responseBody interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-
-	if responseBody != nil {
-		json.NewEncoder(w).Encode(responseBody)
-	}
+// SendJSONResponse sends an HTTP response with the given status code and response body using Gin Gonic's context.
+func SendJSONResponse(c *gin.Context, statusCode int, responseBody interface{}) {
+	c.Header("Content-Type", "application/json")
+	c.JSON(statusCode, responseBody)
 }

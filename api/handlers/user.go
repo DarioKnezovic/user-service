@@ -1,10 +1,10 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
 	"github.com/DarioKnezovic/user-service/internal/user"
 	"github.com/DarioKnezovic/user-service/pkg/util"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 )
@@ -14,31 +14,30 @@ type UserHandler struct {
 }
 
 // RegisterUserHandler handles the registration of a new user.
-func (h *UserHandler) RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) RegisterUserHandler(c *gin.Context) {
 	var newUser user.User
-	err := json.NewDecoder(r.Body).Decode(&newUser)
-	if err != nil {
-		// TODO: add response body
-		util.SendJSONResponse(w, http.StatusBadRequest, nil)
+
+	if err := c.BindJSON(&newUser); err != nil {
+		// Handle JSON decoding error
+		util.SendJSONResponse(c, http.StatusBadRequest, nil)
 		return
 	}
 
 	registeredUser, err := h.UserService.RegisterUser(newUser)
 	if err != nil {
 		// TODO: add response body
-		util.SendJSONResponse(w, http.StatusInternalServerError, nil)
+		util.SendJSONResponse(c, http.StatusInternalServerError, nil)
 		return
 	}
 
-	util.SendJSONResponse(w, http.StatusOK, registeredUser)
+	util.SendJSONResponse(c, http.StatusOK, registeredUser)
 }
 
-func (h *UserHandler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) LoginUserHandler(c *gin.Context) {
 	var loginUser user.User
-	err := json.NewDecoder(r.Body).Decode(&loginUser)
-	if err != nil {
-		util.SendJSONResponse(w, http.StatusBadRequest, nil)
-		log.Println(err)
+	if err := c.BindJSON(&loginUser); err != nil {
+		// Handle JSON decoding error
+		util.SendJSONResponse(c, http.StatusBadRequest, nil)
 		return
 	}
 
@@ -66,7 +65,7 @@ func (h *UserHandler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 			log.Println(err)
 		}
 
-		util.SendJSONResponse(w, statusCode, responseBody)
+		util.SendJSONResponse(c, statusCode, responseBody)
 		return
 	}
 
@@ -74,24 +73,27 @@ func (h *UserHandler) LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 		"token": token,
 	}
 
-	util.SendJSONResponse(w, http.StatusOK, responseBody)
+	util.SendJSONResponse(c, http.StatusOK, responseBody)
 }
 
-func (h *UserHandler) LogoutUserHandler(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) LogoutUserHandler(c *gin.Context) {
 	var loggedUser user.User
-	err := json.NewDecoder(r.Body).Decode(&loggedUser)
-	if err != nil {
-		log.Println(err)
-		util.SendJSONResponse(w, http.StatusBadRequest, nil)
+	if err := c.BindJSON(&loggedUser); err != nil {
+		// Handle JSON decoding error
+		util.SendJSONResponse(c, http.StatusBadRequest, nil)
 		return
 	}
 
-	err = h.UserService.LogoutUser(loggedUser.ID)
+	err := h.UserService.LogoutUser(loggedUser.ID)
 	if err != nil {
 		log.Println(err)
-		util.SendJSONResponse(w, http.StatusInternalServerError, nil)
+		util.SendJSONResponse(c, http.StatusInternalServerError, nil)
 		return
 	}
 
-	util.SendJSONResponse(w, http.StatusOK, nil)
+	util.SendJSONResponse(c, http.StatusOK, nil)
+}
+
+func (h *UserHandler) GetUserDetailsHandler(c *gin.Context) {
+	log.Println("Test")
 }

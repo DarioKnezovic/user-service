@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/DarioKnezovic/user-service/api"
 	"github.com/DarioKnezovic/user-service/config"
 	userGrpc "github.com/DarioKnezovic/user-service/internal/grpc"
 	sessionRepo "github.com/DarioKnezovic/user-service/internal/session/repository"
@@ -10,12 +11,10 @@ import (
 	"github.com/DarioKnezovic/user-service/internal/user/service"
 	"github.com/DarioKnezovic/user-service/pkg/database"
 	user "github.com/DarioKnezovic/user-service/proto"
+	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"log"
 	"net"
-	"net/http"
-
-	"github.com/DarioKnezovic/user-service/api"
 )
 
 func main() {
@@ -42,8 +41,11 @@ func main() {
 	// Create a user service with the repository
 	userService := service.NewUserService(userRepo, sessionService)
 
+	// Create a new Gin Gonic router
+	router := gin.Default()
+
 	// Register the API routes
-	api.RegisterRoutes(userService)
+	api.RegisterRoutes(router, userService)
 
 	// Start gRPC server
 	server := grpc.NewServer()
@@ -67,5 +69,5 @@ func main() {
 
 	// Start the server
 	log.Printf("Server listening on port %s", cfg.APIPort)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", cfg.APIPort), nil))
+	log.Fatal(router.Run(fmt.Sprintf(":%s", cfg.APIPort)))
 }
