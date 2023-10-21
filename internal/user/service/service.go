@@ -71,31 +71,34 @@ func (s *UserService) RegisterUser(newUser user.User) (*user.User, error) {
 }
 
 // LoginUser performs user login and returns the authenticated user with the generated authentication token.
-func (s *UserService) LoginUser(loginUser user.User) (string, error) {
+func (s *UserService) LoginUser(loginUser user.User) (user.LoginResponse, error) {
 	// Retrieve the user from the repository based on the email
 	existingUser, err := s.userRepository.FindUserByEmail(loginUser.Email)
 	if err != nil {
-		return "", err
+		return user.LoginResponse{}, err
 	}
 
 	// Check if the user exists
 	if existingUser == nil {
-		return "", UserErrors[ERR_USER_NOT_FOUND]
+		return user.LoginResponse{}, UserErrors[ERR_USER_NOT_FOUND]
 	}
 
 	// Compare the provided password with the hashed password in the user object
 	err = bcrypt.CompareHashAndPassword([]byte(existingUser.Password), []byte(loginUser.Password))
 	if err != nil {
-		return "", UserErrors[ERR_INVALID_PASSWORD]
+		return user.LoginResponse{}, UserErrors[ERR_INVALID_PASSWORD]
 	}
 
 	token, err := s.sessionService.CreateSession(existingUser)
 	if err != nil {
-		return "", UserErrors[ERR_INTERNAL_SERVER_ERROR]
+		return user.LoginResponse{}, UserErrors[ERR_INTERNAL_SERVER_ERROR]
 	}
 
 	// Return the authenticated user and the generated token
-	return token, nil
+	return user.LoginResponse{
+		User:  existingUser,
+		Token: token,
+	}, nil
 }
 
 func (s *UserService) LogoutUser(userId uint) error {

@@ -17,10 +17,15 @@ type User struct {
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
+type LoginResponse struct {
+	User  *User  `json:"user"`
+	Token string `json:"token"`
+}
+
 // UserService represents the user service interface.
 type UserService interface {
 	RegisterUser(newUser User) (*User, error)
-	LoginUser(loginUser User) (string, error)
+	LoginUser(loginUser User) (LoginResponse, error)
 	LogoutUser(usedId uint) error
 	CheckIsUserExists(userId uint) (bool, error)
 	GetError(key string) error

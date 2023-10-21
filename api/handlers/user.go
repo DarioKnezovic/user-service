@@ -41,7 +41,7 @@ func (h *UserHandler) LoginUserHandler(c *gin.Context) {
 		return
 	}
 
-	token, err := h.UserService.LoginUser(loginUser)
+	response, err := h.UserService.LoginUser(loginUser)
 	if err != nil {
 		var statusCode int
 		var responseBody interface{}
@@ -69,11 +69,7 @@ func (h *UserHandler) LoginUserHandler(c *gin.Context) {
 		return
 	}
 
-	responseBody := map[string]string{
-		"token": token,
-	}
-
-	util.SendJSONResponse(c, http.StatusOK, responseBody)
+	util.SendJSONResponse(c, http.StatusOK, response)
 }
 
 func (h *UserHandler) LogoutUserHandler(c *gin.Context) {
